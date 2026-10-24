@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class MainActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
-    Button btnAddIngredient;
+    Button btnAddIngredient, btnSuggestedRecipes;
     DatabaseHelper dbHelper;
     PantryAdapter adapter;
     Cursor cursor;
@@ -22,17 +22,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 1. Link the UI components
         recyclerView = findViewById(R.id.recyclerView);
         btnAddIngredient = findViewById(R.id.btnAddIngredient);
+        btnSuggestedRecipes = findViewById(R.id.btnSuggestedRecipes);
         dbHelper = new DatabaseHelper(this);
 
-        // 2. Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // 3. THIS IS THE MISSING PIECE: Open Add Screen on button click
         btnAddIngredient.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AddIngredientActivity.class);
+            startActivity(intent);
+        });
+
+        btnSuggestedRecipes.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SuggestedRecipesActivity.class);
             startActivity(intent);
         });
     }
@@ -40,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Load data every time the screen comes into view
         loadPantryData();
     }
 
