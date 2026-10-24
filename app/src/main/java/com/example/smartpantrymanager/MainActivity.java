@@ -22,14 +22,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 1. Link the UI components
         recyclerView = findViewById(R.id.recyclerView);
         btnAddIngredient = findViewById(R.id.btnAddIngredient);
         dbHelper = new DatabaseHelper(this);
 
-        // Setup RecyclerView
+        // 2. Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Open Add Screen
+        // 3. THIS IS THE MISSING PIECE: Open Add Screen on button click
         btnAddIngredient.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AddIngredientActivity.class);
             startActivity(intent);
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Load data every time the screen comes into view (e.g. after adding an item)
+        // Load data every time the screen comes into view
         loadPantryData();
     }
 
