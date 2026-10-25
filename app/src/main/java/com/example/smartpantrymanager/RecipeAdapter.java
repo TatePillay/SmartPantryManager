@@ -1,6 +1,7 @@
 package com.example.smartpantrymanager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         String recipeName = cursor.getString(nameIndex);
 
         holder.tvRecipeName.setText(recipeName);
+
+        // Open Recipe Detail screen when clicked
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, RecipeDetailActivity.class);
+            intent.putExtra("RECIPE_NAME", recipeName);
+            context.startActivity(intent);
+        });
     }
 
     @Override
