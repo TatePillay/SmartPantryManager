@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class MainActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
-    Button btnAddIngredient, btnSuggestedRecipes;
+    Button btnAddIngredient, btnSuggestedRecipes, btnSettings;
     DatabaseHelper dbHelper;
     PantryAdapter adapter;
     Cursor cursor;
@@ -22,13 +22,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Link UI components
         recyclerView = findViewById(R.id.recyclerView);
         btnAddIngredient = findViewById(R.id.btnAddIngredient);
         btnSuggestedRecipes = findViewById(R.id.btnSuggestedRecipes);
+        btnSettings = findViewById(R.id.btnSettings);
         dbHelper = new DatabaseHelper(this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Navigation Click Listeners
         btnAddIngredient.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AddIngredientActivity.class);
             startActivity(intent);
@@ -36,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
 
         btnSuggestedRecipes.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SuggestedRecipesActivity.class);
+            startActivity(intent);
+        });
+
+        btnSettings.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
         });
     }
