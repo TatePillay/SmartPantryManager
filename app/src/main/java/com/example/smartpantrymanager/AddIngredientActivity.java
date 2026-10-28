@@ -1,37 +1,42 @@
 package com.example.smartpantrymanager;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 
 public class AddIngredientActivity extends AppCompatActivity {
 
     EditText etName, etQuantity, etUnit, etExpiry;
     Button btnSave;
     DatabaseHelper dbHelper;
+    long editId = -1; // -1 means we are adding a new item
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("PANTRY_DEBUG", "AddIngredientActivity started");
-
         setContentView(R.layout.activity_add_ingredient);
-        Log.d("PANTRY_DEBUG", "Layout loaded");
 
         etName = findViewById(R.id.etName);
         etQuantity = findViewById(R.id.etQuantity);
         etUnit = findViewById(R.id.etUnit);
         etExpiry = findViewById(R.id.etExpiry);
         btnSave = findViewById(R.id.btnSave);
-        Log.d("PANTRY_DEBUG", "Views linked");
-
         dbHelper = new DatabaseHelper(this);
+
+        // Check if we are editing an existing ingredient
+        if (getIntent().hasExtra("EDIT_ID")) {
+            editId = getIntent().getLongExtra("EDIT_ID", -1);
+            etName.setText(getIntent().getStringExtra("EDIT_NAME"));
+            etQuantity.setText(String.valueOf(getIntent().getDoubleExtra("EDIT_QTY", 0)));
+            etUnit.setText(getIntent().getStringExtra("EDIT_UNIT"));
+            etExpiry.setText(getIntent().getStringExtra("EDIT_EXPIRY"));
+            btnSave.setText("Update Ingredient"); // Change button text
+        }
 
         btnSave.setOnClickListener(v -> saveIngredient());
     }
@@ -51,12 +56,7 @@ public class AddIngredientActivity extends AppCompatActivity {
         try {
             quantity = Double.parseDouble(qtyStr);
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Please enter a valid number for quantity", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (quantity <= 0) {
-            Toast.makeText(this, "Quantity must be greater than 0", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -67,13 +67,20 @@ public class AddIngredientActivity extends AppCompatActivity {
         values.put(DatabaseHelper.COL_UNIT, unit);
         values.put(DatabaseHelper.COL_EXPIRY, expiry);
 
-        long newRowId = db.insert(DatabaseHelper.TABLE_PANTRY, null, values);
-
-        if (newRowId != -1) {
-            Toast.makeText(this, "Ingredient Saved!", Toast.LENGTH_SHORT).show();
-            finish();
+        if (editId == -1) {
+            // CREATE: Insert a new row
+            long newRowId = db.insert(DatabaseHelper.TABLE_PANTRY, null, values);
+            if (newRowId != -1) {
+                Toast.makeText(this, "Ingredient Added!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         } else {
-            Toast.makeText(this, "Error saving ingredient", Toast.LENGTH_SHORT).show();
+            // UPDATE: Modify the existing row
+            int rowsAffected = db.update(DatabaseHelper.TABLE_PANTRY, values, DatabaseHelper.COL_ID + " = ?", new String[]{String.valueOf(editId)});
+            if (rowsAffected > 0) {
+                Toast.makeText(this, "Ingredient Updated!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         }
     }
 }
